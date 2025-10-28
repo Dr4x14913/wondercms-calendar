@@ -215,6 +215,7 @@ function calendarSettings($args) {
     global $Wcms;
     
     // Only show settings for logged-in admins
+    //if (!$Wcms->loggedIn || $Wcms->currentPage != "calendarsettings" ) {
     if (!$Wcms->loggedIn) {
         return $args;
     }
