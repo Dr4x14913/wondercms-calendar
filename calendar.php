@@ -262,6 +262,45 @@ function calendarCss($args) {
         opacity: 0.8;
         cursor: pointer;
     }
+
+    .calendar-settings {
+        margin: 20px 0;
+        padding: 15px;
+        border-radius: 5px;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1000;
+    }
+    
+    .calendar-settings-content {
+        margin-top: 15px;
+        background: #37474F;
+        padding: 20px;
+        border-radius: 5px;
+        border: 1px solid #636363;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 80%;
+        max-width: 600px;
+        z-index: 1001;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .calendar-settings-content textarea {
+        color: black !important;
+        width: 100%;
+    }
+
+    
+    #calendar-settings-toggle {
+        position: absolute;
+        top: 121px;
+        right: 49px;
+    }
     </style>';
     
     $args[0] .= $css;
@@ -292,13 +331,31 @@ function calendarSettings($args) {
     
     $settingsHtml = '
     <div class="calendar-settings">
-        <h3>Calendar Settings</h3>
-        <form method="post">
-            <label for="booked_dates">Booked Dates (comma separated, format: YYYY-MM-DD):</label><br><br>
-            <textarea id="booked_dates" name="booked_dates" rows="10" cols="50">' . implode(',', $bookedDates) . '</textarea><br><br>
-            <input type="submit" name="save_booked_dates" value="Save Booked Dates">
-        </form>
-    </div>';
+        <button id="calendar-settings-toggle" class="btn btn-secondary">Show Calendar Settings</button>
+        <div id="calendar-settings-content" class="calendar-settings-content" style="display: none;">
+            <form method="post">
+                <label for="booked_dates">Booked Dates (comma separated, format: YYYY-MM-DD):</label><br><br>
+                <textarea id="booked_dates" name="booked_dates" rows="10" cols="50">' . implode(',', $bookedDates) . '</textarea><br><br>
+                <input type="submit" name="save_booked_dates" value="Save Booked Dates">
+            </form>
+        </div>
+    </div>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var toggleButton = document.getElementById("calendar-settings-toggle");
+        var settingsContent = document.getElementById("calendar-settings-content");
+        
+        toggleButton.addEventListener("click", function() {
+            if (settingsContent.style.display === "none") {
+                settingsContent.style.display = "block";
+                toggleButton.textContent = "Hide Calendar Settings";
+            } else {
+                settingsContent.style.display = "none";
+                toggleButton.textContent = "Show Calendar Settings";
+            }
+        });
+    });
+    </script>';
     
     $args[0] .= $settingsHtml;
     return $args;
