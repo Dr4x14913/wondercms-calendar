@@ -178,21 +178,26 @@ function calendarCss($args) {
     $css = '
     <style>
     .calendar-container {
-        padding: 15px;
-        border-radius: 5px;
-        margin: 20px 0;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 25px 0;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     }
     
     .calendar-header {
         text-align: center;
-        margin-bottom: 15px;
+        margin-bottom: 20px;
     }
     
     .calendar-navigation {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 10px;
+        margin-bottom: 15px;
+        flex-wrap: wrap;
+        gap: 15px;
+        padding: 0 10px;
     }
     
     .nav-button {
@@ -200,106 +205,318 @@ function calendarCss($args) {
         background: #37474F;
         color: #fff;
         text-decoration: none;
-        border-radius: 3px;
-        border: 1px solid #fff;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 5px;
     }
     
     .nav-button:hover {
         background: #636363;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
     
     .current-month {
-        font-weight: bold;
-        font-size: 1.2em;
+        font-weight: 600;
+        font-size: 1.3em;
+        flex-grow: 1;
+        text-align: center;
     }
     
     .calendar-grid {
         display: grid;
         grid-template-columns: repeat(7, 1fr);
-        gap: 2px;
-        margin-top: 10px;
+        gap: 4px;
+        margin-top: 15px;
     }
     
     .calendar-day-header {
         text-align: center;
-        font-weight: bold;
-        padding: 8px;
+        font-weight: 600;
+        padding: 12px;
         background: #6b5a44;
         color: #fff;
+        border-radius: 6px;
+        font-size: 0.9em;
     }
     
     .calendar-day {
-        min-height: 40px;
+        min-height: 50px;
         display: flex;
         align-items: center;
         justify-content: center;
-        border: 1px solid #37474F;
-        color: #fff;
+        border-radius: 6px;
+        border: 1px solid #e0e0e0;
+        color: #333;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
     }
 
     .calendar-day.booked {
         background-color: #ff6b6b;
         color: white;
+        border-color: #ff5252;
     }
     
     .calendar-day.available {
         background-color: #98b51b;
         color: white;
+        border-color: #8bc34a;
     }
     
-    .calendar-day.selected {
-        background-color: #ffcc00;
-        color: black;
-        font-weight: bold;
-    }
-    
-    .calendar-empty {
-        min-height: 40px;
-        border: 1px solid #37474F;
-    }
-    
-    .calendar-day:hover {
-        opacity: 0.8;
-        cursor: pointer;
-    }
-
-    .calendar-settings {
-        margin: 20px 0;
-        padding: 15px;
-        border-radius: 5px;
+    .calendar-day.selected::after {
+        content: "";
         position: absolute;
         top: 0;
         left: 0;
-        width: 100%;
-        z-index: 1000;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.3);
+        pointer-events: none;
+    }
+    
+    .calendar-empty {
+        min-height: 50px;
+        border: 1px solid #e0e0e0;
+    }
+    
+    .calendar-day:hover {
+        opacity: 0.9;
+        transform: scale(1.05);
+        z-index: 1;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+
+    .calendar-settings {
+        margin: 30px 0;
+        padding: 20px;
+        border-radius: 8px;
+        background: #f0f0f0;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        position: relative;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     }
     
     .calendar-settings-content {
-        margin-top: 15px;
-        background: #37474F;
-        padding: 20px;
-        border-radius: 5px;
-        border: 1px solid #636363;
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 80%;
-        max-width: 600px;
-        z-index: 1001;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-top: 20px;
+        background: #ffffff;
+        padding: 30px;
+        border-radius: 10px;
+        border: 1px solid #e0e0e0;
+        box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+        max-width: 800px;
+        margin: 25px auto;
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
     }
 
     .calendar-settings-content textarea {
-        color: black !important;
+        color: #333 !important;
         width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        resize: vertical;
+        font-family: monospace;
+        font-size: 14px;
+        transition: border-color 0.3s ease;
+    }
+
+    .calendar-settings-content textarea:focus {
+        outline: none;
+        border-color: #4a90e2;
+        box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
     }
 
     
     #calendar-settings-toggle {
-        position: absolute;
-        top: 121px;
-        right: 49px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        top: 0;
+        right: 0;
+        margin-left: 15px;
+        align-self: flex-start;
+    }
+    
+    #calendar-settings-toggle:hover {
+        background: #357abd;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .settings-title {
+        font-size: 1.6em;
+        font-weight: 700;
+        color: #333;
+        margin: 0;
+    }
+    
+    .settings-description {
+        color: #666;
+        margin-bottom: 20px;
+        line-height: 1.6;
+        font-size: 1.05em;
+    }
+    
+    .calendar-controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 20px;
+        justify-content: center;
+    }
+    
+    .calendar-controls button {
+        background: #37474F;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .calendar-controls button:hover {
+        background: #636363;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .calendar-input-group {
+        margin-bottom: 25px;
+    }
+    
+    .calendar-input-group label {
+        display: block;
+        margin-bottom: 10px;
+        font-weight: 600;
+        color: #333;
+        font-size: 1.1em;
+    }
+    
+    .calendar-input-group textarea {
+        width: 100%;
+        min-height: 150px;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-family: monospace;
+        font-size: 14px;
+        resize: vertical;
+    }
+    
+    .calendar-button {
+        padding: 12px 25px;
+        background: #28a745;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        font-size: 1.1em;
+        align-self: flex-start;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .calendar-button:hover {
+        background: #218838;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    
+    .calendar-button:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+    
+    .calendar-section {
+        margin-bottom: 35px;
+    }
+    
+    .calendar-section h3 {
+        margin-bottom: 15px;
+        color: #333;
+        border-bottom: 3px solid #4a90e2;
+        padding-bottom: 8px;
+        font-size: 1.3em;
+    }
+    
+    .calendar-section p {
+        margin-bottom: 15px;
+        color: #666;
+        line-height: 1.6;
+    }
+    
+    .calendar-section .calendar-container {
+        margin: 0;
+        background: #fff;
+        box-shadow: none;
+        border: 1px solid #e0e0e0;
+    }
+    
+    .calendar-section .calendar-container .calendar-grid {
+        gap: 3px;
+    }
+    
+    .calendar-section .calendar-container .calendar-day-header {
+        font-size: 0.95em;
+    }
+    
+    .calendar-section .calendar-container .calendar-day {
+        min-height: 40px;
+    }
+    
+    @media (max-width: 768px) {
+        .calendar-grid {
+            grid-template-columns: repeat(7, 1fr);
+        }
+        
+        .calendar-controls {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .calendar-controls button {
+            width: 100%;
+        }
+        
+        .calendar-navigation {
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .current-month {
+            margin: 10px 0;
+        }
+        
+        .calendar-settings-content {
+            padding: 20px;
+            margin: 15px auto;
+        }
+        
+        #calendar-settings-toggle {
+            align-self: flex-start;
+            margin-left: 0;
+        }
     }
     </style>';
     
@@ -333,18 +550,30 @@ function calendarSettings($args) {
     <div class="calendar-settings">
         <button id="calendar-settings-toggle" class="btn btn-secondary">Show Calendar Settings</button>
         <div id="calendar-settings-content" class="calendar-settings-content" style="display: none;">
-            <h3>Calendar Settings</h3>
+            <div class="calendar-section">
+                <h3>Calendar Management</h3>
+                <p class="settings-description">Manage your calendar by selecting dates below. Click on dates to add them to the booked list. When you are done, save the dates.</p>
+                
+                <div class="calendar-controls">
+                    <button id="select-all-dates"><i class="fas fa-check-square"></i> Select All Dates</button>
+                    <button id="clear-dates"><i class="fas fa-trash-alt"></i> Clear Selected Dates</button>
+                </div>
+                
+                <div class="calendar-container settings-calendar" id="settings-calendar"></div>
+            </div>
             
-            <!-- Additional calendar for date selection -->
-            <h4>Select Dates for Batch Addition</h4>
-            <div class="calendar-container settings-calendar" id="settings-calendar"></div>
-            
-            <p>Click on dates in the calendar above to add them to this list. When you are done, save the dates below.</p>
-            <form method="post">
-                <label for="booked_dates">Booked Dates (comma separated, format: YYYY-MM-DD):</label><br><br>
-                <textarea id="booked_dates" name="booked_dates" rows="10" cols="50">' . implode(',', $bookedDates) . '</textarea><br><br>
-                <input type="submit" name="save_booked_dates" value="Save Booked Dates">
-            </form>
+            <div class="calendar-section">
+                <h3>Booked Dates Configuration</h3>
+                <p class="settings-description">Edit the list of booked dates in comma-separated format (YYYY-MM-DD). Changes will be saved when you click "Save Booked Dates".</p>
+                
+                <form method="post" class="calendar-form">
+                    <div class="calendar-input-group">
+                        <label for="booked_dates">Booked Dates (comma separated, format: YYYY-MM-DD):</label>
+                        <textarea id="booked_dates" name="booked_dates" rows="8">' . implode(',', $bookedDates) . '</textarea>
+                    </div>
+                    <input type="submit" name="save_booked_dates" value="Save Booked Dates" class="calendar-button">
+                </form>
+            </div>
         </div>
     </div>
     <script>
@@ -354,7 +583,7 @@ function calendarSettings($args) {
         
         toggleButton.addEventListener("click", function() {
             if (settingsContent.style.display === "none") {
-                settingsContent.style.display = "block";
+                settingsContent.style.display = "flex";
                 toggleButton.textContent = "Hide Calendar Settings";
             } else {
                 settingsContent.style.display = "none";
@@ -369,14 +598,46 @@ function calendarSettings($args) {
                 var date = e.target.getAttribute("date");
                 var currentDates = textarea.value.split(",").map(d => d.trim()).filter(d => d);
                 if (currentDates.includes(date)) {
-                    console.log(currentDates);
                     // Remove date if it exists
                     currentDates = currentDates.filter(d => d !== date);
+                    e.target.classList.remove("selected");
                 } else {
                     currentDates.push(date);
+                    e.target.classList.add("selected");
                 }
                 textarea.value = currentDates.join(",");
             }
+        });
+        
+        // Add event listeners for the control buttons
+        document.getElementById("select-all-dates").addEventListener("click", function() {
+            var calendarDays = document.querySelectorAll(".calendar-day");
+            var textarea = document.getElementById("booked_dates");
+            var currentDates = textarea.value.split(",").map(d => d.trim()).filter(d => d);
+            
+            calendarDays.forEach(function(day) {
+                var date = day.getAttribute("date");
+                if (!currentDates.includes(date)) {
+                    currentDates.push(date);
+                    day.classList.add("selected");
+                }
+            });
+            
+            textarea.value = currentDates.join(",");
+        });
+        
+        document.getElementById("clear-dates").addEventListener("click", function() {
+            var calendarDays = document.querySelectorAll(".calendar-day.selected");
+            var textarea = document.getElementById("booked_dates");
+            var currentDates = textarea.value.split(",").map(d => d.trim()).filter(d => d);
+            
+            calendarDays.forEach(function(day) {
+                var date = day.getAttribute("date");
+                currentDates = currentDates.filter(d => d !== date);
+                day.classList.remove("selected");
+            });
+            
+            textarea.value = currentDates.join(",");
         });
     });
     </script>';
