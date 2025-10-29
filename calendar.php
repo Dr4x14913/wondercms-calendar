@@ -29,7 +29,7 @@ function renderCalendar($args) {
     
     // Replace all divs with class "customCalendar" with the calendar
     $content = preg_replace_callback('/<div class="customCalendar">.*?<\/div>/s', function($matches) {
-        return renderCalendarHtml();
+        return '<div class="calendar-container">'.renderCalendarHtml().'</div>';
     }, $content);
     
     $args[0] = $content;
@@ -48,27 +48,18 @@ function renderCalendarHtml() {
     $year = $currentDate->format('Y');
     $month = $currentDate->format('m');
     
-    // Handle navigation
-    if (isset($_GET['month']) && is_numeric($_GET['month']) && $_GET['month'] >= 1 && $_GET['month'] <= 12) {
-        $month = (int)$_GET['month'];
-    }
-    if (isset($_GET['year']) && is_numeric($_GET['year'])) {
-        $year = (int)$_GET['year'];
-    }
-    
     // Create the first day of the month
     $firstDayOfMonth = new DateTime("$year-$month-01");
     $daysInMonth = (int)$firstDayOfMonth->format('t');
     $firstDayOfWeek = (int)$firstDayOfMonth->format('N'); // 1 for Monday, 7 for Sunday
     
     // Generate calendar HTML
-    $html = '<div class="calendar-container">';
-    $html .= '<div class="calendar-header">';
+    $html = '<div class="calendar-header">';
     $html .= '<h3>Availability Calendar</h3>';
     $html .= '<div class="calendar-navigation">';
-    $html .= '<a href="?month=' . ($month - 1) . '&year=' . $year . '" class="nav-button">&laquo; Prev</a>';
+    $html .= '<a href="#" class="nav-button nav-button-ajax prev-month">&laquo; Prev</a>';
     $html .= '<span class="current-month">' . $firstDayOfMonth->format('F Y') . '</span>';
-    $html .= '<a href="?month=' . ($month + 1) . '&year=' . $year . '" class="nav-button">Next &raquo;</a>';
+    $html .= '<a href="#" class="nav-button nav-button-ajax next-month">Next &raquo;</a>';
     $html .= '</div>';
     $html .= '</div>';
     $html .= '<div class="calendar-grid">';
@@ -99,7 +90,6 @@ function renderCalendarHtml() {
     }
     
     $html .= '</div>';
-    $html .= '</div>';
     
     return $html;
 }
@@ -128,11 +118,110 @@ function saveBookedDates($dates) {
  * Add JavaScript for calendar functionality
  */
 function calendarJs($args) {
+    // Get all booked dates for JavaScript initialization
+    $bookedDates = getBookedDates();
+    
+    // Convert booked dates to JavaScript array
+    $bookedDatesJson = json_encode($bookedDates);
+    
     $js = '
     <script>
-    // JavaScript can be added here for enhanced functionality
+    // JavaScript for calendar navigation without page reload
     document.addEventListener("DOMContentLoaded", function() {
-        // Add any JavaScript functionality you need
+        // Store booked dates in JavaScript
+        var bookedDates = ' . $bookedDatesJson . ';
+        
+        // Current date
+        var currentDate = new Date();
+        var currentYear = currentDate.getFullYear();
+        var currentMonth = currentDate.getMonth(); // 0-based month
+        
+        // Calendar display function
+        function displayCalendar(year, month) {
+            // Get calendar container
+            var calendarContainer = document.querySelector(".calendar-container");
+            var monthNames = ["January", "February", "March", "April", "May", "June",
+                              "July", "August", "September", "October", "November", "December"];
+            
+            // Create the first day of the month
+            var firstDayOfMonth = new Date(year, month, 1);
+            var daysInMonth = new Date(year, month + 1, 0).getDate();
+            var firstDayOfWeek = firstDayOfMonth.getDay(); // 0 for Sunday, 1 for Monday, etc.
+            
+            // Adjust for Sunday being 0 in JavaScript but 7 in PHP
+            if (firstDayOfWeek === 0) {
+                firstDayOfWeek = 7;
+            }
+            
+            // Generate calendar HTML
+            var html = \'<div class="calendar-header">\' +
+                \'<h3>Availability Calendar</h3>\' +
+                \'<div class="calendar-navigation">\' +
+                \'<a href="#" class="nav-button nav-button-ajax prev-month">&laquo; Prev</a>\' +
+                \'<span class="current-month">\' + monthNames[month] + \' \' + year + \'</span>\' +
+                \'<a href="#" class="nav-button nav-button-ajax next-month">Next &raquo;</a>\' +
+                \'</div>\' +
+                \'</div>\' +
+                \'<div class="calendar-grid">\';
+            
+            // Days of week header
+            var days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+            for (var i = 0; i < days.length; i++) {
+                html += \'<div class="calendar-day-header">\' + days[i] + \'</div>\';
+            }
+            
+            // Empty cells for days before the first day of the month
+            for (var i = 1; i < firstDayOfWeek; i++) {
+                html += \'<div class="calendar-empty"></div>\';
+            }
+            
+            // Calendar days
+            for (var day = 1; day <= daysInMonth; day++) {
+                var date = year + "-" + (month + 1 < 10 ? "0" : "") + (month + 1) + "-" + (day < 10 ? "0" : "") + day;
+                var isBooked = bookedDates.includes(date);
+                
+                if (isBooked) {
+                    html += \'<div class="calendar-day booked">\' + day + \'</div>\';
+                } else {
+                    html += \'<div class="calendar-day available">\' + day + \'</div>\';
+                }
+            }
+            
+            html += \'</div>\';
+            
+            // Set the HTML to the container
+            calendarContainer.innerHTML = html;
+            
+            // Reattach event listeners
+            attachEventListeners();
+        }
+        
+        // Attach event listeners to navigation buttons
+        function attachEventListeners() {
+            var navButtons = document.querySelectorAll(".nav-button-ajax");
+            navButtons.forEach(function(button) {
+                button.addEventListener("click", function(e) {
+                    e.preventDefault();
+                    if (e.target.classList.contains("prev-month")) {
+                        currentMonth--;
+                        if (currentMonth < 0) {
+                            currentMonth = 11;
+                            currentYear--;
+                        }
+                    } else if (e.target.classList.contains("next-month")) {
+                        currentMonth++;
+                        if (currentMonth > 11) {
+                            currentMonth = 0;
+                            currentYear++;
+                        }
+                    }
+                    displayCalendar(currentYear, currentMonth);
+                });
+            });
+        }
+        
+        // Initialize calendar display
+        displayCalendar(currentYear, currentMonth);
     });
     </script>';
     
