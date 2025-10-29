@@ -48,16 +48,30 @@ function renderCalendarHtml() {
     $year = $currentDate->format('Y');
     $month = $currentDate->format('m');
     
+    // Handle navigation
+    if (isset($_GET['month']) && is_numeric($_GET['month']) && $_GET['month'] >= 1 && $_GET['month'] <= 12) {
+        $month = (int)$_GET['month'];
+    }
+    if (isset($_GET['year']) && is_numeric($_GET['year'])) {
+        $year = (int)$_GET['year'];
+    }
+    
+    // Create the first day of the month
+    $firstDayOfMonth = new DateTime("$year-$month-01");
+    $daysInMonth = (int)$firstDayOfMonth->format('t');
+    $firstDayOfWeek = (int)$firstDayOfMonth->format('N'); // 1 for Monday, 7 for Sunday
+    
     // Generate calendar HTML
     $html = '<div class="calendar-container">';
     $html .= '<div class="calendar-header">';
     $html .= '<h3>Availability Calendar</h3>';
+    $html .= '<div class="calendar-navigation">';
+    $html .= '<a href="?month=' . ($month - 1) . '&year=' . $year . '" class="nav-button">&laquo; Prev</a>';
+    $html .= '<span class="current-month">' . $firstDayOfMonth->format('F Y') . '</span>';
+    $html .= '<a href="?month=' . ($month + 1) . '&year=' . $year . '" class="nav-button">Next &raquo;</a>';
+    $html .= '</div>';
     $html .= '</div>';
     $html .= '<div class="calendar-grid">';
-    
-    // Generate calendar days
-    $daysInMonth = date('t', mktime(0, 0, 0, $month, 1, $year));
-    $firstDayOfWeek = date('N', mktime(0, 0, 0, $month, 1, $year));
     
     // Days of week header
     $days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -66,6 +80,8 @@ function renderCalendarHtml() {
     }
     
     // Empty cells for days before the first day of the month
+    // We need to account for the fact that DateTime::N returns 1 for Monday and 7 for Sunday
+    // So we need to shift the starting position to align with the first day of the week
     for ($i = 1; $i < $firstDayOfWeek; $i++) {
         $html .= '<div class="calendar-empty"></div>';
     }
@@ -112,31 +128,15 @@ function saveBookedDates($dates) {
  * Add JavaScript for calendar functionality
  */
 function calendarJs($args) {
-    global $Wcms;
+    $js = '
+    <script>
+    // JavaScript can be added here for enhanced functionality
+    document.addEventListener("DOMContentLoaded", function() {
+        // Add any JavaScript functionality you need
+    });
+    </script>';
     
-    // Only show on calendar settings page if logged in
-    if ($Wcms->loggedIn && $Wcms->currentPage == 'calendarSettings') {
-        $js = '
-        <script>
-        function toggleBooking(date) {
-            var bookedDates = localStorage.getItem("bookedDates");
-            if (!bookedDates) bookedDates = "[]";
-            bookedDates = JSON.parse(bookedDates);
-            
-            var index = bookedDates.indexOf(date);
-            if (index > -1) {
-                bookedDates.splice(index, 1);
-            } else {
-                bookedDates.push(date);
-            }
-            
-            localStorage.setItem("bookedDates", JSON.stringify(bookedDates));
-            location.reload();
-        }
-        </script>';
-        $args[0] .= $js;
-    }
-    
+    $args[0] .= $js;
     return $args;
 }
 
@@ -157,6 +157,30 @@ function calendarCss($args) {
     .calendar-header {
         text-align: center;
         margin-bottom: 15px;
+    }
+    
+    .calendar-navigation {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    
+    .nav-button {
+        padding: 5px 10px;
+        background: #007cba;
+        color: white;
+        text-decoration: none;
+        border-radius: 3px;
+    }
+    
+    .nav-button:hover {
+        background: #005a87;
+    }
+    
+    .current-month {
+        font-weight: bold;
+        font-size: 1.2em;
     }
     
     .calendar-grid {
