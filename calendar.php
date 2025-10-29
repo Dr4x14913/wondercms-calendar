@@ -296,17 +296,34 @@ function calendarCss($args) {
     }
 
     .calendar-settings-content {
-        margin-top: 20px;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 90%;
+        max-width: 800px;
         background: #ffffff;
         padding: 30px;
         border-radius: 10px;
         border: 1px solid #e0e0e0;
         box-shadow: 0 6px 16px rgba(0,0,0,0.15);
-        max-width: 800px;
-        margin: 25px auto;
+        z-index: 1000;
         display: flex;
         flex-direction: column;
         gap: 25px;
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+    
+    @media (max-width: 768px) {
+        .calendar-settings-content {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 90%;
+            margin: 0 10px;
+        }
     }
 
     .calendar-settings-content textarea {
@@ -335,12 +352,25 @@ function calendarCss($args) {
         top: 141px;
         right: 49px;
         z-index: 1000;
+        padding: 10px 15px;
+        background: #4a90e2;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-weight: 500;
     }
     
     #calendar-settings-toggle:hover {
         background: #357abd;
         transform: translateY(-2px);
         box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    @media (max-width: 768px) {
+        #calendar-settings-toggle {
+            top: 50px;
+            right: 10px;
+        }
     }
     
     .settings-title {
@@ -533,32 +563,45 @@ function calendarSettings($args) {
     $settingsHtml = '
     <button id="calendar-settings-toggle" class="btn btn-secondary">Show Calendar Settings</button>
     <div id="calendar-settings-content" class="calendar-settings-content" style="display: none;">
-        <div class="calendar-section">
-            <h3>Calendar Management</h3>
-            <p class="settings-description">Manage your calendar by selecting dates below. Click on dates to add them to the booked list. When you are done, save the dates.</p>
-            
-            <div class="calendar-controls">
-                <button id="select-all-dates">Occuper tout le mois</button>
-                <button id="clear-dates">Libérer tout le mois</button>
+        <div class="settings-flex-container">
+            <div class="settings-calendar-section">
+                <div class="calendar-section">
+                    <h3>Calendar Management</h3>
+                    <p class="settings-description">Manage your calendar by selecting dates below. Click on dates to add them to the booked list. When you are done, save the dates.</p>
+                    
+                    <div class="calendar-controls">
+                        <button id="select-all-dates">Occuper tout le mois</button>
+                        <button id="clear-dates">Libérer tout le mois</button>
+                    </div>
+                    
+                    <div class="calendar-container settings-calendar" id="settings-calendar"></div>
+                </div>
             </div>
             
-            <div class="calendar-container settings-calendar" id="settings-calendar"></div>
-        </div>
-        
-        <div class="calendar-section">
-            <h3>Booked Dates Configuration</h3>
-            <p class="settings-description">Edit the list of booked dates in comma-separated format (YYYY-MM-DD). Changes will be saved when you click "Save Booked Dates".</p>
-            
-            <form method="post" class="calendar-form">
-                <div class="calendar-input-group">
-                    <label for="booked_dates">Booked Dates (comma separated, format: YYYY-MM-DD):</label>
-                    <textarea id="booked_dates" name="booked_dates" rows="8">' . implode(',', $bookedDates) . '</textarea>
+            <div class="settings-textarea-section">
+                <div class="calendar-section">
+                    <h3>Booked Dates Configuration</h3>
+                    <p class="settings-description">Edit the list of booked dates in comma-separated format (YYYY-MM-DD). Changes will be saved when you click "Save Booked Dates".</p>
+                    
+                    <form method="post" class="calendar-form">
+                        <div class="calendar-input-group">
+                            <label for="booked_dates">Booked Dates (comma separated, format: YYYY-MM-DD):</label>
+                            <textarea id="booked_dates" name="booked_dates" rows="8">' . implode(',', $bookedDates) . '</textarea>
+                        </div>
+                        <input type="submit" name="save_booked_dates" value="Save Booked Dates" class="calendar-button">
+                    </form>
                 </div>
-                <input type="submit" name="save_booked_dates" value="Save Booked Dates" class="calendar-button">
-            </form>
+            </div>
         </div>
     </div>
     <script>
+    function toggleClass(divobject, class_name) {
+        if (divobject.classList.contains(class_name)) {
+            divobject.classList.remove(class_name);
+        } else {
+            divobject.classList.add(class_name);
+        }
+    }
     document.addEventListener("DOMContentLoaded", function() {
         var toggleButton = document.getElementById("calendar-settings-toggle");
         var settingsContent = document.getElementById("calendar-settings-content");
@@ -580,12 +623,11 @@ function calendarSettings($args) {
                 var date = e.target.getAttribute("date");
                 var currentDates = textarea.value.split(",").map(d => d.trim()).filter(d => d);
                 if (currentDates.includes(date)) {
-                    // Remove date if it exists
                     currentDates = currentDates.filter(d => d !== date);
-                    e.target.classList.remove("selected");
+                    toggleClass(e.target, "selected");
                 } else {
                     currentDates.push(date);
-                    e.target.classList.add("selected");
+                    toggleClass(e.target, "selected");
                 }
                 textarea.value = currentDates.join(",");
             }
