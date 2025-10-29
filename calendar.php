@@ -363,24 +363,20 @@ function calendarSettings($args) {
         });
 
         const settings_calendar = document.getElementById("settings-calendar");
-        settings_calendar.addEventListener("click", function() {
-            const dayCells = document.querySelectorAll(".settings-calendar .calendar-day");
+        settings_calendar.addEventListener("click", function(e) {
             var textarea = document.getElementById("booked_dates");
-
-            dayCells.forEach(cell => {
-                cell.addEventListener("click", function() {
-                    var date = cell.getAttribute("date");
-                    var currentDates = textarea.value.split(",").map(d => d.trim()).filter(d => d);
-                    if (currentDates.includes(date)) {
-                        console.log(currentDates);
-                        // Remove date if it exists
-                        currentDates = currentDates.filter(d => d !== date);
-                    } else {
-                        currentDates.push(date);
-                    }
-                    textarea.value = currentDates.join(",");
-                });
-            });
+            if (e.target.classList.contains("calendar-day")) {
+                var date = e.target.getAttribute("date");
+                var currentDates = textarea.value.split(",").map(d => d.trim()).filter(d => d);
+                if (currentDates.includes(date)) {
+                    console.log(currentDates);
+                    // Remove date if it exists
+                    currentDates = currentDates.filter(d => d !== date);
+                } else {
+                    currentDates.push(date);
+                }
+                textarea.value = currentDates.join(",");
+            }
         });
     });
     </script>';
