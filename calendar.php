@@ -295,16 +295,6 @@ function calendarCss($args) {
         box-shadow: 0 4px 8px rgba(0,0,0,0.15);
     }
 
-    .calendar-settings {
-        margin: 30px 0;
-        padding: 20px;
-        border-radius: 8px;
-        background: #f0f0f0;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        position: relative;
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    }
-    
     .calendar-settings-content {
         margin-top: 20px;
         background: #ffffff;
@@ -339,14 +329,12 @@ function calendarCss($args) {
 
     
     #calendar-settings-toggle {
-        border: none;
         cursor: pointer;
         transition: all 0.3s ease;
-        position: relative;
-        top: 0;
-        right: 0;
-        margin-left: 15px;
-        align-self: flex-start;
+        position: fixed;
+        top: 141px;
+        right: 49px;
+        z-index: 1000;
     }
     
     #calendar-settings-toggle:hover {
@@ -547,33 +535,31 @@ function calendarSettings($args) {
     $bookedDates = getBookedDates();
     
     $settingsHtml = '
-    <div class="calendar-settings">
-        <button id="calendar-settings-toggle" class="btn btn-secondary">Show Calendar Settings</button>
-        <div id="calendar-settings-content" class="calendar-settings-content" style="display: none;">
-            <div class="calendar-section">
-                <h3>Calendar Management</h3>
-                <p class="settings-description">Manage your calendar by selecting dates below. Click on dates to add them to the booked list. When you are done, save the dates.</p>
-                
-                <div class="calendar-controls">
-                    <button id="select-all-dates"><i class="fas fa-check-square"></i> Select All Dates</button>
-                    <button id="clear-dates"><i class="fas fa-trash-alt"></i> Clear Selected Dates</button>
-                </div>
-                
-                <div class="calendar-container settings-calendar" id="settings-calendar"></div>
+    <button id="calendar-settings-toggle" class="btn btn-secondary">Show Calendar Settings</button>
+    <div id="calendar-settings-content" class="calendar-settings-content" style="display: none;">
+        <div class="calendar-section">
+            <h3>Calendar Management</h3>
+            <p class="settings-description">Manage your calendar by selecting dates below. Click on dates to add them to the booked list. When you are done, save the dates.</p>
+            
+            <div class="calendar-controls">
+                <button id="select-all-dates"><i class="fas fa-check-square"></i> Select All Dates</button>
+                <button id="clear-dates"><i class="fas fa-trash-alt"></i> Clear Selected Dates</button>
             </div>
             
-            <div class="calendar-section">
-                <h3>Booked Dates Configuration</h3>
-                <p class="settings-description">Edit the list of booked dates in comma-separated format (YYYY-MM-DD). Changes will be saved when you click "Save Booked Dates".</p>
-                
-                <form method="post" class="calendar-form">
-                    <div class="calendar-input-group">
-                        <label for="booked_dates">Booked Dates (comma separated, format: YYYY-MM-DD):</label>
-                        <textarea id="booked_dates" name="booked_dates" rows="8">' . implode(',', $bookedDates) . '</textarea>
-                    </div>
-                    <input type="submit" name="save_booked_dates" value="Save Booked Dates" class="calendar-button">
-                </form>
-            </div>
+            <div class="calendar-container settings-calendar" id="settings-calendar"></div>
+        </div>
+        
+        <div class="calendar-section">
+            <h3>Booked Dates Configuration</h3>
+            <p class="settings-description">Edit the list of booked dates in comma-separated format (YYYY-MM-DD). Changes will be saved when you click "Save Booked Dates".</p>
+            
+            <form method="post" class="calendar-form">
+                <div class="calendar-input-group">
+                    <label for="booked_dates">Booked Dates (comma separated, format: YYYY-MM-DD):</label>
+                    <textarea id="booked_dates" name="booked_dates" rows="8">' . implode(',', $bookedDates) . '</textarea>
+                </div>
+                <input type="submit" name="save_booked_dates" value="Save Booked Dates" class="calendar-button">
+            </form>
         </div>
     </div>
     <script>
