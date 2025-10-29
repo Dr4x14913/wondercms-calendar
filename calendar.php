@@ -352,12 +352,9 @@ function calendarCss($args) {
         top: 141px;
         right: 49px;
         z-index: 1000;
-        padding: 10px 15px;
-        background: #4a90e2;
         color: white;
         border: none;
         border-radius: 6px;
-        font-weight: 500;
     }
     
     #calendar-settings-toggle:hover {
