@@ -178,11 +178,12 @@ function calendarCss($args) {
     $css = '
     <style>
     .calendar-container {
-        border: 1px solid #ccc;
+        border: 1px solid #37474F;
         padding: 15px;
         border-radius: 5px;
         margin: 20px 0;
-        background: #f9f9f9;
+        background: #37474F;
+        color: #fff;
     }
     
     .calendar-header {
@@ -199,19 +200,21 @@ function calendarCss($args) {
     
     .nav-button {
         padding: 5px 10px;
-        background: #007cba;
-        color: white;
+        background: #37474F;
+        color: #fff;
         text-decoration: none;
         border-radius: 3px;
+        border: 1px solid #fff;
     }
     
     .nav-button:hover {
-        background: #005a87;
+        background: #636363;
     }
     
     .current-month {
         font-weight: bold;
         font-size: 1.2em;
+        color: #fff;
     }
     
     .calendar-grid {
@@ -225,7 +228,8 @@ function calendarCss($args) {
         text-align: center;
         font-weight: bold;
         padding: 8px;
-        background: #e0e0e0;
+        background: #636363;
+        color: #fff;
     }
     
     .calendar-day {
@@ -233,8 +237,9 @@ function calendarCss($args) {
         display: flex;
         align-items: center;
         justify-content: center;
-        border: 1px solid #ddd;
-        background: #fff;
+        border: 1px solid #fff;
+        background: #37474F;
+        color: #fff;
     }
     
     .calendar-day.booked {
@@ -243,14 +248,14 @@ function calendarCss($args) {
     }
     
     .calendar-day.available {
-        background-color: #51cf66;
+        background-color: #98b51b;
         color: white;
     }
     
     .calendar-empty {
         min-height: 40px;
-        border: 1px solid #ddd;
-        background: #fff;
+        border: 1px solid #fff;
+        background: #37474F;
     }
     
     .calendar-day:hover {
