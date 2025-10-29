@@ -123,9 +123,9 @@ function calendarJs($args) {
                 var isBooked = bookedDates.includes(date);
                 
                 if (isBooked) {
-                    html += \'<div class="calendar-day booked">\' + day + \'</div>\';
+                    html += \'<div class="calendar-day booked" date="\'+date+\'">\' + day + \'</div>\';
                 } else {
-                    html += \'<div class="calendar-day available">\' + day + \'</div>\';
+                    html += \'<div class="calendar-day available" date="\'+date+\'">\' + day + \'</div>\';
                 }
             }
             
@@ -236,7 +236,7 @@ function calendarCss($args) {
         border: 1px solid #37474F;
         color: #fff;
     }
-    
+
     .calendar-day.booked {
         background-color: #ff6b6b;
         color: white;
@@ -245,6 +245,12 @@ function calendarCss($args) {
     .calendar-day.available {
         background-color: #98b51b;
         color: white;
+    }
+    
+    .calendar-day.selected {
+        background-color: #ffcc00;
+        color: black;
+        font-weight: bold;
     }
     
     .calendar-empty {
@@ -308,7 +314,7 @@ function calendarSettings($args) {
     global $Wcms;
     
     // Only show settings for logged-in admins
-    //if (!$Wcms->loggedIn || $Wcms->currentPage != "calendarsettings" ) {
+    //if (!$Wcms->loggedIn || $Wcms->currentPage != "calendarsettings" ) 
     if (!$Wcms->loggedIn) {
         return $args;
     }
@@ -327,6 +333,13 @@ function calendarSettings($args) {
     <div class="calendar-settings">
         <button id="calendar-settings-toggle" class="btn btn-secondary">Show Calendar Settings</button>
         <div id="calendar-settings-content" class="calendar-settings-content" style="display: none;">
+            <h3>Calendar Settings</h3>
+            
+            <!-- Additional calendar for date selection -->
+            <h4>Select Dates for Batch Addition</h4>
+            <div class="calendar-container settings-calendar" id="settings-calendar"></div>
+            
+            <p>Click on dates in the calendar above to add them to this list. When you are done, save the dates below.</p>
             <form method="post">
                 <label for="booked_dates">Booked Dates (comma separated, format: YYYY-MM-DD):</label><br><br>
                 <textarea id="booked_dates" name="booked_dates" rows="10" cols="50">' . implode(',', $bookedDates) . '</textarea><br><br>
@@ -347,6 +360,27 @@ function calendarSettings($args) {
                 settingsContent.style.display = "none";
                 toggleButton.textContent = "Show Calendar Settings";
             }
+        });
+
+        const settings_calendar = document.getElementById("settings-calendar");
+        settings_calendar.addEventListener("click", function() {
+            const dayCells = document.querySelectorAll(".settings-calendar .calendar-day");
+            var textarea = document.getElementById("booked_dates");
+
+            dayCells.forEach(cell => {
+                cell.addEventListener("click", function() {
+                    var date = cell.getAttribute("date");
+                    var currentDates = textarea.value.split(",").map(d => d.trim()).filter(d => d);
+                    if (currentDates.includes(date)) {
+                        console.log(currentDates);
+                        // Remove date if it exists
+                        currentDates = currentDates.filter(d => d !== date);
+                    } else {
+                        currentDates.push(date);
+                    }
+                    textarea.value = currentDates.join(",");
+                });
+            });
         });
     });
     </script>';
