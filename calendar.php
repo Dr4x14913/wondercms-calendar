@@ -29,69 +29,11 @@ function renderCalendar($args) {
     
     // Replace all divs with class "customCalendar" with the calendar
     $content = preg_replace_callback('/<div class="customCalendar">.*?<\/div>/s', function($matches) {
-        return '<div class="calendar-container">'.renderCalendarHtml().'</div>';
+        return '<div class="calendar-container"></div>';
     }, $content);
     
     $args[0] = $content;
     return $args;
-}
-
-/**
- * Generate calendar HTML
- */
-function renderCalendarHtml() {
-    // Get booked dates from file
-    $bookedDates = getBookedDates();
-    
-    // Get current date
-    $currentDate = new DateTime();
-    $year = $currentDate->format('Y');
-    $month = $currentDate->format('m');
-    
-    // Create the first day of the month
-    $firstDayOfMonth = new DateTime("$year-$month-01");
-    $daysInMonth = (int)$firstDayOfMonth->format('t');
-    $firstDayOfWeek = (int)$firstDayOfMonth->format('N'); // 1 for Monday, 7 for Sunday
-    
-    // Generate calendar HTML
-    $html = '<div class="calendar-header">';
-    $html .= '<h3>Availability Calendar</h3>';
-    $html .= '<div class="calendar-navigation">';
-    $html .= '<a href="#" class="nav-button nav-button-ajax prev-month">&laquo; Prev</a>';
-    $html .= '<span class="current-month">' . $firstDayOfMonth->format('F Y') . '</span>';
-    $html .= '<a href="#" class="nav-button nav-button-ajax next-month">Next &raquo;</a>';
-    $html .= '</div>';
-    $html .= '</div>';
-    $html .= '<div class="calendar-grid">';
-    
-    // Days of week header
-    $days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    foreach ($days as $day) {
-        $html .= '<div class="calendar-day-header">' . $day . '</div>';
-    }
-    
-    // Empty cells for days before the first day of the month
-    // We need to account for the fact that DateTime::N returns 1 for Monday and 7 for Sunday
-    // So we need to shift the starting position to align with the first day of the week
-    for ($i = 1; $i < $firstDayOfWeek; $i++) {
-        $html .= '<div class="calendar-empty"></div>';
-    }
-    
-    // Calendar days
-    for ($day = 1; $day <= $daysInMonth; $day++) {
-        $date = sprintf('%04d-%02d-%02d', $year, $month, $day);
-        $isBooked = in_array($date, $bookedDates);
-        
-        if ($isBooked) {
-            $html .= '<div class="calendar-day booked">' . $day . '</div>';
-        } else {
-            $html .= '<div class="calendar-day available">' . $day . '</div>';
-        }
-    }
-    
-    $html .= '</div>';
-    
-    return $html;
 }
 
 /**
