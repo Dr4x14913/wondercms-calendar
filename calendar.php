@@ -82,8 +82,8 @@ function calendarJs($args) {
         function displayCalendar(year, month) {
             // Get calendar container
             var calendarContainer = document.querySelector(".calendar-container");
-            var monthNames = ["January", "February", "March", "April", "May", "June",
-                              "July", "August", "September", "October", "November", "December"];
+            var monthNames = ["janvier", "février", "mars", "avril", "mai", "juin",
+                              "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
             
             // Create the first day of the month
             var firstDayOfMonth = new Date(year, month, 1);
@@ -97,17 +97,17 @@ function calendarJs($args) {
             
             // Generate calendar HTML
             var html = \'<div class="calendar-header">\' +
-                \'<h3>Availability Calendar</h3>\' +
+                \'<h3>Calendrier des disponibilité</h3>\' +
                 \'<div class="calendar-navigation">\' +
-                \'<a href="#" class="nav-button nav-button-ajax prev-month">&laquo; Prev</a>\' +
+                \'<div class="nav-button nav-button-ajax prev-month">&laquo; Prev</div>\' +
                 \'<span class="current-month">\' + monthNames[month] + \' \' + year + \'</span>\' +
-                \'<a href="#" class="nav-button nav-button-ajax next-month">Next &raquo;</a>\' +
+                \'<div class="nav-button nav-button-ajax next-month">Next &raquo;</div>\' +
                 \'</div>\' +
                 \'</div>\' +
                 \'<div class="calendar-grid">\';
             
             // Days of week header
-            var days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+            var days = ["lun", "mar", "mer", "jeu", "ven", "sam", "dim"];
             for (var i = 0; i < days.length; i++) {
                 html += \'<div class="calendar-day-header">\' + days[i] + \'</div>\';
             }
@@ -178,12 +178,9 @@ function calendarCss($args) {
     $css = '
     <style>
     .calendar-container {
-        border: 1px solid #37474F;
         padding: 15px;
         border-radius: 5px;
         margin: 20px 0;
-        background: #37474F;
-        color: #fff;
     }
     
     .calendar-header {
@@ -214,7 +211,6 @@ function calendarCss($args) {
     .current-month {
         font-weight: bold;
         font-size: 1.2em;
-        color: #fff;
     }
     
     .calendar-grid {
@@ -228,7 +224,7 @@ function calendarCss($args) {
         text-align: center;
         font-weight: bold;
         padding: 8px;
-        background: #636363;
+        background: #6b5a44;
         color: #fff;
     }
     
@@ -237,8 +233,7 @@ function calendarCss($args) {
         display: flex;
         align-items: center;
         justify-content: center;
-        border: 1px solid #fff;
-        background: #37474F;
+        border: 1px solid #37474F;
         color: #fff;
     }
     
@@ -254,8 +249,7 @@ function calendarCss($args) {
     
     .calendar-empty {
         min-height: 40px;
-        border: 1px solid #fff;
-        background: #37474F;
+        border: 1px solid #37474F;
     }
     
     .calendar-day:hover {
