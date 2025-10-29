@@ -359,19 +359,15 @@ function calendarCss($args) {
     
     .calendar-controls {
         display: flex;
-        flex-wrap: wrap;
         gap: 12px;
-        margin-bottom: 20px;
+        margin-bottom: 10;
         justify-content: center;
     }
     
     .calendar-controls button {
-        background: #37474F;
-        color: #fff;
         border: none;
         border-radius: 6px;
         cursor: pointer;
-        font-weight: 500;
         transition: all 0.3s ease;
         display: flex;
         align-items: center;
@@ -542,8 +538,8 @@ function calendarSettings($args) {
             <p class="settings-description">Manage your calendar by selecting dates below. Click on dates to add them to the booked list. When you are done, save the dates.</p>
             
             <div class="calendar-controls">
-                <button id="select-all-dates"><i class="fas fa-check-square"></i> Select All Dates</button>
-                <button id="clear-dates"><i class="fas fa-trash-alt"></i> Clear Selected Dates</button>
+                <button id="select-all-dates">Occuper tout le mois</button>
+                <button id="clear-dates">Libérer tout le mois</button>
             </div>
             
             <div class="calendar-container settings-calendar" id="settings-calendar"></div>
@@ -613,14 +609,14 @@ function calendarSettings($args) {
         });
         
         document.getElementById("clear-dates").addEventListener("click", function() {
-            var calendarDays = document.querySelectorAll(".calendar-day.selected");
+            var calendarDays = document.querySelectorAll(".calendar-day");
             var textarea = document.getElementById("booked_dates");
             var currentDates = textarea.value.split(",").map(d => d.trim()).filter(d => d);
             
             calendarDays.forEach(function(day) {
                 var date = day.getAttribute("date");
                 currentDates = currentDates.filter(d => d !== date);
-                day.classList.remove("selected");
+                day.classList.add("selected");
             });
             
             textarea.value = currentDates.join(",");
