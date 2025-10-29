@@ -352,7 +352,6 @@ function calendarCss($args) {
         top: 141px;
         right: 49px;
         z-index: 1000;
-        color: white;
         border: none;
         border-radius: 6px;
     }
@@ -387,7 +386,7 @@ function calendarCss($args) {
     .calendar-controls {
         display: flex;
         gap: 12px;
-        margin-bottom: 10;
+        margin: 10px;
         justify-content: center;
     }
     
