@@ -176,7 +176,11 @@ function calendarJs($args) {
  */
 function calendarCss($args) {
     global $Wcms;
-    $args[0] .= "<link rel='stylesheet' href='{$Wcms->url('plugins/calendar/css/style.css')}'>"; 
+    $file = "css/style.css";
+    $fullPath = realpath(__DIR__ . '/' . $file);
+    $docRoot = realpath($_SERVER['DOCUMENT_ROOT']);
+    $relative = str_replace('\\', '/', str_replace($docRoot, '', $fullPath));
+    $args[0] .= "<link rel='stylesheet' href='{$Wcms->url($relative)}'>"; 
     return $args;
 }
 
@@ -187,7 +191,6 @@ function calendarSettings($args) {
     global $Wcms;
     
     // Only show settings for logged-in admins
-    //if (!$Wcms->loggedIn || $Wcms->currentPage != "calendarsettings" ) 
     if (!$Wcms->loggedIn) {
         return $args;
     }
