@@ -23,15 +23,15 @@ if (defined('VERSION')) {
  */
 function renderCalendar($args) {
     global $Wcms;
-    
+
     // Get current page content
     $content = $args[0];
-    
-    // Replace all divs with class "customCalendar" with the calendar
-    $content = preg_replace_callback('/<div class="customCalendar">.*?<\/div>/s', function($matches) {
+
+    // Replace all divs with class "wondercms-calendar" with the calendar
+    $content = preg_replace_callback('/<div class="wondercms-calendar">.*?<\/div>/s', function($matches) {
         return '<div class="calendar-container"></div>';
     }, $content);
-    
+
     $args[0] = $content;
     return $args;
 }
@@ -62,39 +62,39 @@ function saveBookedDates($dates) {
 function calendarJs($args) {
     // Get all booked dates for JavaScript initialization
     $bookedDates = getBookedDates();
-    
+
     // Convert booked dates to JavaScript array
     $bookedDatesJson = json_encode($bookedDates);
-    
+
     $js = '
     <script>
     // JavaScript for calendar navigation without page reload
     document.addEventListener("DOMContentLoaded", function() {
         // Store booked dates in JavaScript
         var bookedDates = ' . $bookedDatesJson . ';
-        
+
         // Current date
         var currentDate = new Date();
         var currentYear = currentDate.getFullYear();
         var currentMonth = currentDate.getMonth(); // 0-based month
-        
+
         // Calendar display function
         function displayCalendar(year, month) {
             // Get calendar container
             var calendarContainer = document.querySelector(".calendar-container");
             var monthNames = ["janvier", "février", "mars", "avril", "mai", "juin",
                               "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
-            
+
             // Create the first day of the month
             var firstDayOfMonth = new Date(year, month, 1);
             var daysInMonth = new Date(year, month + 1, 0).getDate();
             var firstDayOfWeek = firstDayOfMonth.getDay(); // 0 for Sunday, 1 for Monday, etc.
-            
+
             // Adjust for Sunday being 0 in JavaScript but 7 in PHP
             if (firstDayOfWeek === 0) {
                 firstDayOfWeek = 7;
             }
-            
+
             // Generate calendar HTML
             var html = \'<div class="calendar-header">\' +
                 \'<h3>Calendrier des disponibilité</h3>\' +
@@ -105,39 +105,39 @@ function calendarJs($args) {
                 \'</div>\' +
                 \'</div>\' +
                 \'<div class="calendar-grid">\';
-            
+
             // Days of week header
             var days = ["lun", "mar", "mer", "jeu", "ven", "sam", "dim"];
             for (var i = 0; i < days.length; i++) {
                 html += \'<div class="calendar-day-header">\' + days[i] + \'</div>\';
             }
-            
+
             // Empty cells for days before the first day of the month
             for (var i = 1; i < firstDayOfWeek; i++) {
                 html += \'<div class="calendar-empty"></div>\';
             }
-            
+
             // Calendar days
             for (var day = 1; day <= daysInMonth; day++) {
                 var date = year + "-" + (month + 1 < 10 ? "0" : "") + (month + 1) + "-" + (day < 10 ? "0" : "") + day;
                 var isBooked = bookedDates.includes(date);
-                
+
                 if (isBooked) {
                     html += \'<div class="calendar-day booked" date="\'+date+\'">\' + day + \'</div>\';
                 } else {
                     html += \'<div class="calendar-day available" date="\'+date+\'">\' + day + \'</div>\';
                 }
             }
-            
+
             html += \'</div>\';
-            
+
             // Set the HTML to the container
             calendarContainer.innerHTML = html;
-            
+
             // Reattach event listeners
             attachEventListeners();
         }
-        
+
         // Attach event listeners to navigation buttons
         function attachEventListeners() {
             var navButtons = document.querySelectorAll(".nav-button-ajax");
@@ -161,12 +161,12 @@ function calendarJs($args) {
                 });
             });
         }
-        
+
         // Initialize calendar display
         displayCalendar(currentYear, currentMonth);
     });
     </script>';
-    
+
     $args[0] .= $js;
     return $args;
 }
@@ -180,7 +180,7 @@ function calendarCss($args) {
     $fullPath = realpath(__DIR__ . '/' . $file);
     $docRoot = realpath($_SERVER['DOCUMENT_ROOT']);
     $relative = str_replace('\\', '/', str_replace($docRoot, '', $fullPath));
-    $args[0] .= "<link rel='stylesheet' href='{$Wcms->url($relative)}'>"; 
+    $args[0] .= "<link rel='stylesheet' href='{$Wcms->url($relative)}'>";
     return $args;
 }
 
@@ -189,22 +189,22 @@ function calendarCss($args) {
  */
 function calendarSettings($args) {
     global $Wcms;
-    
+
     // Only show settings for logged-in admins
     if (!$Wcms->loggedIn) {
         return $args;
     }
-    
+
     // Handle form submission
     if (isset($_POST['save_booked_dates'])) {
         $bookedDates = explode(',', $_POST['booked_dates']);
         $bookedDates = array_map('trim', $bookedDates);
         saveBookedDates($bookedDates);
     }
-    
+
     // Get current booked dates
     $bookedDates = getBookedDates();
-    
+
     $settingsHtml = '
     <button id="calendar-settings-toggle" class="btn btn-secondary">Show Calendar Settings</button>
     <div id="calendar-settings-content" class="calendar-settings-content" style="display: none;">
@@ -213,21 +213,21 @@ function calendarSettings($args) {
                 <div class="calendar-section">
                     <h3>Calendar Management</h3>
                     <p class="settings-description">Manage your calendar by selecting dates below. Click on dates to add them to the booked list. When you are done, save the dates.</p>
-                    
+
                     <div class="calendar-controls">
                         <button id="select-all-dates">Occuper tout le mois</button>
                         <button id="clear-dates">Libérer tout le mois</button>
                     </div>
-                    
+
                     <div class="calendar-container settings-calendar" id="settings-calendar"></div>
                 </div>
             </div>
-            
+
             <div class="settings-textarea-section">
                 <div class="calendar-section">
                     <h3>Booked Dates Configuration</h3>
                     <p class="settings-description">Edit the list of booked dates in comma-separated format (YYYY-MM-DD). Changes will be saved when you click "Save Booked Dates".</p>
-                    
+
                     <form method="post" class="calendar-form">
                         <div class="calendar-input-group">
                             <label for="booked_dates">Booked Dates (comma separated, format: YYYY-MM-DD):</label>
@@ -250,7 +250,7 @@ function calendarSettings($args) {
     document.addEventListener("DOMContentLoaded", function() {
         var toggleButton = document.getElementById("calendar-settings-toggle");
         var settingsContent = document.getElementById("calendar-settings-content");
-        
+
         toggleButton.addEventListener("click", function() {
             if (settingsContent.style.display === "none") {
                 settingsContent.style.display = "flex";
@@ -277,13 +277,13 @@ function calendarSettings($args) {
                 textarea.value = currentDates.join(",");
             }
         });
-        
+
         // Add event listeners for the control buttons
         document.getElementById("select-all-dates").addEventListener("click", function() {
             var calendarDays = document.querySelectorAll(".calendar-day");
             var textarea = document.getElementById("booked_dates");
             var currentDates = textarea.value.split(",").map(d => d.trim()).filter(d => d);
-            
+
             calendarDays.forEach(function(day) {
                 var date = day.getAttribute("date");
                 if (!currentDates.includes(date)) {
@@ -291,26 +291,26 @@ function calendarSettings($args) {
                     day.classList.add("selected");
                 }
             });
-            
+
             textarea.value = currentDates.join(",");
         });
-        
+
         document.getElementById("clear-dates").addEventListener("click", function() {
             var calendarDays = document.querySelectorAll(".calendar-day");
             var textarea = document.getElementById("booked_dates");
             var currentDates = textarea.value.split(",").map(d => d.trim()).filter(d => d);
-            
+
             calendarDays.forEach(function(day) {
                 var date = day.getAttribute("date");
                 currentDates = currentDates.filter(d => d !== date);
                 day.classList.add("selected");
             });
-            
+
             textarea.value = currentDates.join(",");
         });
     });
     </script>';
-    
+
     $args[0] .= $settingsHtml;
     return $args;
 }
