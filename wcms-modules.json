@@ -1,12 +1,12 @@
 {
     "version": 1,
     "plugins": {
-        "plugin-name": {
-            "name": "Wondercms clendar",
+        "wondercms-calendar": {
+            "name": "Wondercms calendar",
             "repo": "https://github.com/Dr4x14913/wondercms-calendar/tree/master",
             "zip": "https://github.com/Dr4x14913/wondercms-calendar/archive/master.zip",
             "summary": "Availability calendar for tourism websites",
-            "version": "2.0.0",
+            "version": "1.0.0",
             "image": "https://raw.githubusercontent.com/Dr4x14913/wondercms-calendar/master/preview.jpg"
         }
     }
