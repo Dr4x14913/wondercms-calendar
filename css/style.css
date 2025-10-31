@@ -322,6 +322,7 @@
     @media (max-width: 768px) {
         .calendar-grid {
             grid-template-columns: repeat(7, 1fr);
+            overflow-x: auto;
         }
 
         .calendar-controls {
