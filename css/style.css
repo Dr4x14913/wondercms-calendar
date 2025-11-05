@@ -22,6 +22,36 @@
         padding: 0 10px;
     }
 
+    .calendar-dropdowns {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .calendar-dropdown {
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 1em;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        color: #333;
+        font-weight: 500;
+    }
+
+    .calendar-dropdown:hover {
+        border-color: #4a90e2;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        background: #f8f9fa;
+    }
+
+    .calendar-dropdown:focus {
+        outline: none;
+        border-color: #4a90e2;
+        box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+    }
+
     .nav-button {
         padding: 5px 10px;
         background: #37474F;

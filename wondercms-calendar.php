@@ -100,7 +100,14 @@ function calendarJs($args) {
                 \'<h3>Calendrier des disponibilité</h3>\' +
                 \'<div class="calendar-navigation">\' +
                 \'<div class="nav-button nav-button-ajax prev-month">&laquo; Prev</div>\' +
-                \'<span class="current-month">\' + monthNames[month] + \' \' + year + \'</span>\' +
+                \'<div class="calendar-dropdowns">\' +
+                \'<select class="calendar-dropdown month-dropdown">\' + 
+                monthNames.map((monthName, index) => \'<option value="\' + index + \'" \' + (index === month ? \'selected\' : \'\') + \'>\' + monthName + \'</option>\').join(\'\') +
+                \'</select>\' +
+                \'<select class="calendar-dropdown year-dropdown">\' + 
+                Array.from({length: 5}, (_, i) => currentYear - 2 + i).map(yearOption => \'<option value="\' + yearOption + \'" \' + (yearOption === year ? \'selected\' : \'\') + \'>\' + yearOption + \'</option>\').join(\'\') +
+                \'</select>\' +
+                \'</div>\' +
                 \'<div class="nav-button nav-button-ajax next-month">Next &raquo;</div>\' +
                 \'</div>\' +
                 \'</div>\' +
@@ -138,28 +145,76 @@ function calendarJs($args) {
             attachEventListeners();
         }
 
-        // Attach event listeners to navigation buttons
+        // Attach event listeners to navigation buttons and dropdowns
         function attachEventListeners() {
-            var navButtons = document.querySelectorAll(".nav-button-ajax");
-            navButtons.forEach(function(button) {
-                button.addEventListener("click", function(e) {
-                    e.preventDefault();
-                    if (e.target.classList.contains("prev-month")) {
-                        currentMonth--;
-                        if (currentMonth < 0) {
-                            currentMonth = 11;
-                            currentYear--;
-                        }
-                    } else if (e.target.classList.contains("next-month")) {
-                        currentMonth++;
-                        if (currentMonth > 11) {
-                            currentMonth = 0;
-                            currentYear++;
-                        }
-                    }
-                    displayCalendar(currentYear, currentMonth);
-                });
+            // Remove existing event listeners to prevent duplicates
+            var prevButtons = document.querySelectorAll(".prev-month");
+            var nextButtons = document.querySelectorAll(".next-month");
+            var monthDropdowns = document.querySelectorAll(".month-dropdown");
+            var yearDropdowns = document.querySelectorAll(".year-dropdown");
+            
+            // Remove previous listeners
+            prevButtons.forEach(function(button) {
+                button.removeEventListener("click", navigateCalendar);
             });
+            nextButtons.forEach(function(button) {
+                button.removeEventListener("click", navigateCalendar);
+            });
+            
+            monthDropdowns.forEach(function(dropdown) {
+                dropdown.removeEventListener("change", handleMonthChange);
+            });
+            
+            yearDropdowns.forEach(function(dropdown) {
+                dropdown.removeEventListener("change", handleYearChange);
+            });
+
+            // Add new event listeners
+            prevButtons.forEach(function(button) {
+                button.addEventListener("click", navigateCalendar);
+            });
+            nextButtons.forEach(function(button) {
+                button.addEventListener("click", navigateCalendar);
+            });
+            
+            monthDropdowns.forEach(function(dropdown) {
+                dropdown.addEventListener("change", handleMonthChange);
+            });
+            
+            yearDropdowns.forEach(function(dropdown) {
+                dropdown.addEventListener("change", handleYearChange);
+            });
+        }
+
+        // Navigation function
+        function navigateCalendar(e) {
+            e.preventDefault();
+            if (e.target.classList.contains("prev-month")) {
+                currentMonth--;
+                if (currentMonth < 0) {
+                    currentMonth = 11;
+                    currentYear--;
+                }
+            } else if (e.target.classList.contains("next-month")) {
+                currentMonth++;
+                if (currentMonth > 11) {
+                    currentMonth = 0;
+                    currentYear++;
+                }
+            }
+            displayCalendar(currentYear, currentMonth);
+        }
+
+        // Month change handler
+        function handleMonthChange(e) {
+            currentMonth = parseInt(e.target.value);
+            displayCalendar(currentYear, currentMonth);
+        }
+
+        // Year change handler
+        function handleYearChange(e) {
+            currentYear = parseInt(e.target.value);
+            displayCalendar(currentYear, currentMonth);
         }
 
         // Initialize calendar display
